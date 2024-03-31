@@ -1,35 +1,39 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from 'react';
+import { 
+  BrowserRouter as Router, 
+  Route,
+  Routes,
+  Navigate 
+} from 'react-router-dom';
+import LoginPage from './pages/UnauthenticatedPages/LoginPage';
+import DashboardPage from './pages/AuthenticatedPages/DashboardPage';
 
-function App() {
-  const [count, setCount] = useState(0)
+const ProtectedRoute = ({ children }) => {
+  const isAuthenticated = localStorage.getItem('accessToken') !== null; // Check if user is authenticated
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
+};
 
+const RedirectIfAuthenticated = ({ children }) => {
+  const accessToken = localStorage.getItem('accessToken');
+
+  // If an access token exists, redirect to the dashboard
+  if (accessToken) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
+};
+
+const App = () => {
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <Router>
+      <Routes>
+        <Route path="/login" element={<RedirectIfAuthenticated><LoginPage /></RedirectIfAuthenticated>} />
+        <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+        <Route path="*" element={<Navigate to="/login" replace />} /> {/* Redirects any unknown routes to login */}
+      </Routes>
+    </Router>
+  );
+};
 
-export default App
+export default App;
