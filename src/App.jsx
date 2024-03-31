@@ -1,27 +1,52 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   BrowserRouter as Router, 
   Route,
-  Routes,
+  Routes, 
   Navigate 
 } from 'react-router-dom';
 import LoginPage from './pages/UnauthenticatedPages/LoginPage';
 import DashboardPage from './pages/AuthenticatedPages/DashboardPage';
+import { verifyToken } from './utils/AxiosHelper';
+
+const useVerifyToken = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const isValidToken = await verifyToken(); // This now directly returns a boolean
+      setIsAuthenticated(isValidToken);
+    };
+
+    checkAuth();
+  }, []);
+
+  return isAuthenticated;
+};
+
 
 const ProtectedRoute = ({ children }) => {
-  const isAuthenticated = localStorage.getItem('accessToken') !== null; // Check if user is authenticated
+  const isAuthenticated = useVerifyToken();
+
+  // While checking, consider showing a loading spinner or similar
+  if (isAuthenticated === null) {
+    return <div>Loading2...</div>;
+  }
+  console.log("ProtectedRoute: " + isAuthenticated);
   return isAuthenticated ? children : <Navigate to="/login" replace />;
 };
 
 const RedirectIfAuthenticated = ({ children }) => {
-  const accessToken = localStorage.getItem('accessToken');
+  const isAuthenticated = useVerifyToken();
 
-  // If an access token exists, redirect to the dashboard
-  if (accessToken) {
-    return <Navigate to="/dashboard" replace />;
+  // While checking, consider showing a loading spinner or similar
+  if (isAuthenticated === null) {
+    return <div>Loading1...</div>;
   }
 
-  return children;
+  console.log("RedirectIfAuthenticated: " + isAuthenticated);
+
+  return isAuthenticated ? <Navigate to="/dashboard" replace /> : children;
 };
 
 const App = () => {
