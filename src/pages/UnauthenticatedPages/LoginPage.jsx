@@ -22,7 +22,7 @@ const LoginPage = () => {
     
         try {
             // Use Axios to send a POST request
-            const response = await axios.post('http://127.0.0.1:8000/api/auth/login', {
+            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/login`, {
                 email: email,
                 password: password
             });

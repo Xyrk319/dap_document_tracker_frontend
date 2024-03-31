@@ -1,8 +1,14 @@
+import AuthenticatedLayout from "../Layouts/AuthenticatedLayout";
+
 const DashboardPage = () => (
-    <div>
-      <h2>Dashboard</h2>
-    </div>
-  );
+    <>
+      <AuthenticatedLayout>
+        <div>
+          Dashboard
+        </div>
+      </AuthenticatedLayout>
+    </>
+);
 
 
 export default DashboardPage;
